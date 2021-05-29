@@ -27,10 +27,10 @@
       function listenMessage(msg) {
         alert(msg);
       }
-      if (window.addEventListener) {
-        window.addEventListener("message", listenMessage, false);
+      if (document.addEventListener) {
+        document.addEventListener("message", listenMessage, false);
       } else {
-        window.attachEvent("onmessage", listenMessage);
+        document.attachEvent("onmessage", listenMessage);
       }
       var map;
       require([
