@@ -84,12 +84,10 @@
         }
 
         function listenMessage(msg) {
-          alert("moving");
-          GoToPlace(
-            getRandomArbitrary(0, 100),
-            1,
-            getRandomArbitrary(6000000, 7000000)
-          );
+          var h1 = getRandomArbitrary(0, 100);
+          var h2 = getRandomArbitrary(6000000, 7000000);
+          alert("moving to " + h1 + " " + h2);
+          GoToPlace(h1, 1, h2);
         }
         if (window.addEventListener) {
           window.addEventListener("message", listenMessage, false);
