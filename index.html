@@ -32,11 +32,14 @@
     </style>
 
     <script>
-      require(["esri/WebMap", "esri/views/MapView", "esri/widgets/Editor"], (
-        WebMap,
-        MapView,
-        Editor
-      ) => {
+      require([
+        "esri/WebMap",
+        "esri/views/MapView",
+        "esri/widgets/Editor",
+        "esri/views/SceneView",
+        "esri/layers/VectorTileLayer",
+        "esri/layers/FeatureLayer",
+      ], (WebMap, MapView, Editor, SceneView) => {
         let pointLayer, lineLayer, polygonLayer;
 
         // Create a map from the referenced webmap item id
@@ -46,12 +49,23 @@
           },
         });
 
-        const view = new MapView({
+        const view = new SceneView({
           container: "viewDiv",
           map: webmap,
+
+          scale: 5000000000,
+
+          center: [-101.17, 21.78],
+          alphaCompositingEnabled: true,
+          environment: {
+            // set a transparent background
+            background: {
+              type: "color",
+              color: [44, 56, 64, 255],
+            },
+          },
         });
 
-        GoToPlace(32, 7, 100000000);
         function getRandomArbitrary(min, max) {
           return Math.random() * (max - min) + min;
         }
@@ -82,6 +96,7 @@
             }
           );
         }
+        GoToPlace(32, 7, 100000000);
 
         function listenMessage(msg) {
           var h1 = getRandomArbitrary(0, 100);
