@@ -1,31 +1,37 @@
-<!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
+    <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="initial-scale=1, maximum-scale=1,user-scalable=no"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
-    <title>Class Breaks Renderer</title>
+    <title>
+      Edit features with the Editor widget | Sample | ArcGIS API for JavaScript
+      4.19
+    </title>
 
     <link
       rel="stylesheet"
-      href="https://js.arcgis.com/3.36/esri/css/esri.css"
+      href="https://js.arcgis.com/4.19/esri/themes/light/main.css"
     />
+    <script src="https://js.arcgis.com/4.19/"></script>
+
     <style>
       html,
       body,
-      #map {
-        height: 100%;
-        margin: 0;
+      #viewDiv {
         padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      .esri-editor .esri-item-list__scroller {
+        max-height: 350px;
       }
     </style>
-    <script src="https://js.arcgis.com/3.36/"></script>
-    <script>
-      var holo = true;
 
+    <script>
       window.postMessage("I'm loaded", "*");
       function listenMessage(msg) {
         alert(msg.data + " test");
@@ -37,89 +43,161 @@
       } else {
         window.attachEvent("onmessage", listenMessage);
       }
-      var map;
-      require([
-        "esri/map",
-        "esri/layers/FeatureLayer",
-        "esri/InfoTemplate",
-        "esri/symbols/SimpleFillSymbol",
-        "esri/renderers/ClassBreaksRenderer",
-        "esri/Color",
-        "dojo/dom-style",
-        "dojo/domReady!",
-      ], function (
-        Map,
-        FeatureLayer,
-        InfoTemplate,
-        SimpleFillSymbol,
-        ClassBreaksRenderer,
-        Color,
-        domStyle
-      ) {
-        map = new Map("map", {
-          basemap: "streets",
-          center: [-98.215, 38.382],
-          zoom: 7,
-          slider: false,
+
+      require(["esri/WebMap", "esri/views/MapView", "esri/widgets/Editor"], (
+        WebMap,
+        MapView,
+        Editor
+      ) => {
+        let pointLayer, lineLayer, polygonLayer;
+
+        // Create a map from the referenced webmap item id
+        const webmap = new WebMap({
+          portalItem: {
+            id: "459a495fc16d4d4caa35e92e895694c8",
+          },
         });
 
-        var symbol = new SimpleFillSymbol();
-        symbol.setColor(new Color([150, 150, 150, 0.5]));
+        const view = new MapView({
+          container: "viewDiv",
+          map: webmap,
+        });
 
-        // Add five breaks to the renderer.
-        // If you have ESRI's ArcMap available, this can be a good way to determine break values.
-        // You can also copy the RGB values from the color schemes ArcMap applies, or use colors
-        // from a site like www.colorbrewer.org
-        //
-        // alternatively, ArcGIS Server's generate renderer task could be used
+        view.when(() => {
+          view.map.loadAll().then(() => {
+            view.map.allLayers.forEach((layer) => {
+              if (layer.type === "feature") {
+                switch (layer.geometryType) {
+                  case "polygon":
+                    polygonLayer = layer;
+                    break;
+                  case "polyline":
+                    lineLayer = layer;
+                    break;
+                  case "point":
+                    pointLayer = layer;
+                    break;
+                }
+              }
+            });
 
-        var renderer = new ClassBreaksRenderer(symbol, "POP07_SQMI");
-        renderer.addBreak(
-          0,
-          25,
-          new SimpleFillSymbol().setColor(new Color([56, 168, 0, 0.5]))
-        );
-        renderer.addBreak(
-          25,
-          75,
-          new SimpleFillSymbol().setColor(new Color([139, 209, 0, 0.5]))
-        );
-        renderer.addBreak(
-          75,
-          175,
-          new SimpleFillSymbol().setColor(new Color([255, 255, 0, 0.5]))
-        );
-        renderer.addBreak(
-          175,
-          400,
-          new SimpleFillSymbol().setColor(new Color([255, 128, 0, 0.5]))
-        );
-        renderer.addBreak(
-          400,
-          Infinity,
-          new SimpleFillSymbol().setColor(new Color([255, 0, 0, 0.5]))
-        );
+            // Create layerInfos for layers in Editor. This
+            // sets the fields for editing.
 
-        var infoTemplate = new InfoTemplate("${NAME}", "${*}");
-        var featureLayer = null;
-        var featureLayer = new FeatureLayer(
-          "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3",
-          {
-            mode: FeatureLayer.MODE_SNAPSHOT,
-            outFields: ["*"],
-            infoTemplate: infoTemplate,
-          }
-        );
-        featureLayer.setDefinitionExpression("STATE_NAME = 'Kansas'");
-        featureLayer.setRenderer(renderer);
-        map.addLayer(featureLayer);
-        if (holo) {
-        }
+            const pointInfos = {
+              layer: pointLayer,
+              fieldConfig: [
+                {
+                  name: "HazardType",
+                  label: "Hazard type",
+                },
+                {
+                  name: "Description",
+                  label: "Description",
+                },
+                {
+                  name: "SpecialInstructions",
+                  label: "Special Instructions",
+                },
+                {
+                  name: "Status",
+                  label: "Status",
+                },
+                {
+                  name: "Priority",
+                  label: "Priority",
+                },
+              ],
+            };
+
+            const lineInfos = {
+              layer: lineLayer,
+              fieldConfig: [
+                {
+                  name: "Severity",
+                  label: "Severity",
+                },
+                {
+                  name: "blocktype",
+                  label: "Type of blockage",
+                },
+                {
+                  name: "fullclose",
+                  label: "Full closure",
+                },
+                {
+                  name: "active",
+                  label: "Active",
+                },
+                {
+                  name: "locdesc",
+                  label: "Location Description",
+                },
+              ],
+            };
+
+            const polyInfos = {
+              layer: polygonLayer,
+              fieldConfig: [
+                {
+                  name: "incidenttype",
+                  label: "Incident Type",
+                },
+                {
+                  name: "activeincid",
+                  label: "Active",
+                },
+                {
+                  name: "descrip",
+                  label: "Description",
+                },
+              ],
+            };
+
+            const editor = new Editor({
+              view: view,
+              layerInfos: [
+                {
+                  layer: pointLayer,
+                  fieldConfig: [pointInfos],
+                },
+                {
+                  layer: lineLayer,
+                  fieldConfig: [lineInfos],
+                },
+                {
+                  layer: polygonLayer,
+                  fieldConfig: [polyInfos],
+                },
+              ],
+              // Set the snapping options for the Editor. By default, snapping is enabled. This can be toggled on/off using the CTRL key.
+              snappingOptions: {
+                enabled: true,
+                selfEnabled: true,
+                featureEnabled: true,
+                featureSources: [
+                  {
+                    layer: pointLayer,
+                  },
+                  {
+                    layer: lineLayer,
+                  },
+                  {
+                    layer: polygonLayer,
+                  },
+                ],
+              },
+            });
+            // Add widget to top-right of the view
+            view.ui.add(editor, "top-right");
+          });
+        });
       });
     </script>
   </head>
 
   <body>
-    <div id="map"></div>
+    <div id="viewDiv"></div>
+    <div id="editorDiv"></div>
   </body>
 </html>
