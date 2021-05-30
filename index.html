@@ -24,10 +24,14 @@
     </style>
     <script src="https://js.arcgis.com/3.36/"></script>
     <script>
-      function listenMessage(msg) {
-        alert(msg);
-      }
+      var holo = true;
 
+      window.postMessage("I'm loaded", "*");
+      function listenMessage(msg) {
+        alert(msg.data + " test");
+        console.log(msg.data);
+        holo = !holo;
+      }
       if (window.addEventListener) {
         window.addEventListener("message", listenMessage, false);
       } else {
@@ -68,7 +72,6 @@
         // from a site like www.colorbrewer.org
         //
         // alternatively, ArcGIS Server's generate renderer task could be used
-        var holo = true;
 
         var renderer = new ClassBreaksRenderer(symbol, "POP07_SQMI");
         renderer.addBreak(
@@ -109,11 +112,10 @@
               infoTemplate: infoTemplate,
             }
           );
+          featureLayer.setDefinitionExpression("STATE_NAME = 'Kansas'");
+          featureLayer.setRenderer(renderer);
+          map.addLayer(featureLayer);
         }
-
-        featureLayer.setDefinitionExpression("STATE_NAME = 'Kansas'");
-        featureLayer.setRenderer(renderer);
-        map.addLayer(featureLayer);
       });
     </script>
   </head>
