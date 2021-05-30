@@ -102,19 +102,18 @@
 
         var infoTemplate = new InfoTemplate("${NAME}", "${*}");
         var featureLayer = null;
-
+        var featureLayer = new FeatureLayer(
+          "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3",
+          {
+            mode: FeatureLayer.MODE_SNAPSHOT,
+            outFields: ["*"],
+            infoTemplate: infoTemplate,
+          }
+        );
+        featureLayer.setDefinitionExpression("STATE_NAME = 'Kansas'");
+        featureLayer.setRenderer(renderer);
+        map.addLayer(featureLayer);
         if (holo) {
-          var featureLayer = new FeatureLayer(
-            "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3",
-            {
-              mode: FeatureLayer.MODE_SNAPSHOT,
-              outFields: ["*"],
-              infoTemplate: infoTemplate,
-            }
-          );
-          featureLayer.setDefinitionExpression("STATE_NAME = 'Kansas'");
-          featureLayer.setRenderer(renderer);
-          map.addLayer(featureLayer);
         }
       });
     </script>
