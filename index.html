@@ -32,9 +32,9 @@
     </style>
 
     <script>
+      var holo = true;
       window.postMessage("I'm loaded", "*");
       function listenMessage(msg) {
-        alert(msg.data + " test");
         console.log(msg.data);
         holo = !holo;
       }
@@ -189,7 +189,9 @@
               },
             });
             // Add widget to top-right of the view
-            view.ui.add(editor, "top-right");
+            if (holo) {
+              view.ui.add(editor, "top-right");
+            }
           });
         });
       });
