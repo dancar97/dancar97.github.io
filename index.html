@@ -24,13 +24,17 @@
     </style>
     <script src="https://js.arcgis.com/3.36/"></script>
     <script>
-      function listenMessage(msg) {
-        alert(msg);
-      }
-      if (document.addEventListener) {
-        document.addEventListener("message", listenMessage, false);
-      } else {
-        document.attachEvent("onmessage", listenMessage);
+      window.addEventListener(
+        "message",
+        function (event) {
+          console.log("Received post message", event);
+          logMessage(event.data);
+        },
+        false
+      );
+      function logMessage(message) {
+        log.append(new Date() + " " + message + "\n");
+        alert(message);
       }
       var map;
       require([
