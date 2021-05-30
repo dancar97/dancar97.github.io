@@ -32,11 +32,13 @@
     </style>
 
     <script>
-      var holo = true;
-      window.postMessage("I'm loaded", "*");
       function listenMessage(msg) {
-        console.log(msg.data);
-        holo = !holo;
+        alert("moving");
+        GoToPlace(
+          getRandomArbitrary(0, 100),
+          1,
+          getRandomArbitrary(6000000, 7000000)
+        );
       }
       if (window.addEventListener) {
         window.addEventListener("message", listenMessage, false);
@@ -62,6 +64,37 @@
           container: "viewDiv",
           map: webmap,
         });
+
+        function getRandomArbitrary(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+
+        function shiftCamera(deg) {
+          var camera = view.camera.clone();
+          camera.position.z += deg;
+          return camera;
+        }
+
+        function GoToPlace(XX, YY, ZZ) {
+          view.goTo(
+            {
+              position: {
+                x: XX,
+                y: YY,
+                z: ZZ,
+                spatialReference: {
+                  wkid: 4326,
+                },
+              },
+              heading: 0,
+              tilt: 0,
+            },
+            {
+              speedFactor: 0.4,
+              easing: "in-out-expo",
+            }
+          );
+        }
 
         view.when(() => {
           view.map.loadAll().then(() => {
