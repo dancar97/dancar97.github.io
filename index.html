@@ -49,21 +49,9 @@
           },
         });
 
-        const view = new SceneView({
+        const view = new MapView({
           container: "viewDiv",
           map: webmap,
-
-          scale: 5000000000,
-
-          center: [-101.17, 21.78],
-          alphaCompositingEnabled: true,
-          environment: {
-            // set a transparent background
-            background: {
-              type: "color",
-              color: [44, 56, 64, 255],
-            },
-          },
         });
 
         function getRandomArbitrary(min, max) {
@@ -236,9 +224,8 @@
               },
             });
             // Add widget to top-right of the view
-            if (holo) {
-              view.ui.add(editor, "top-right");
-            }
+
+            view.ui.add(editor, "top-right");
           });
         });
       });
